@@ -1,3 +1,4 @@
+import { upsertStreamUser } from "../lib/stream.js";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 
@@ -34,6 +35,17 @@ export const register = async (req, res) => {
       middleName,
       password,
     });
+    try {
+      await upsertStreamUser({
+        id: newUser._id.toString(),
+        name: `${newUser.firstName} ${newUser.lastName}`,
+        image: "",
+      });
+      console.log("Stream user created/updated successfully");
+    } catch (error) {
+      console.log("Error in upsertStreamUser:", error);
+    }
+
     const token = generateToken(newUser._id);
 
     res.cookie("jwt", token, {
