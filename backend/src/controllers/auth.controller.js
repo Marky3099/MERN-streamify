@@ -93,6 +93,52 @@ export const logout = (req, res) => {
   res.clearCookie("jwt");
   res.status(200).json({ message: "Logged out successfully" });
 };
+export const onboard = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    console.log("Onboarding userId from req.user (protectRoute): ", userId);
+
+    const { firstName, middleName, lastName, bio, age, gender, address } =
+      req.body;
+
+    if (!firstName || !lastName) {
+      return res.status(400).json({
+        message: "First name and last name are required",
+        missingFields: [
+          !firstName && "firstName",
+          !lastName && "lastName",
+        ].filter(Boolean),
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        ...req.body,
+        isOnboarded: true,
+      },
+      { new: true }
+    );
+
+    if (!updatedUser)
+      return res.status(404).json({ message: "User not found" });
+    try {
+      await upsertStreamUser({
+        id: updatedUser._id.toString(),
+        name: `${updatedUser.firstName} ${updatedUser.lastName}`,
+        image: updatedUser.profilePicture || "",
+      });
+      console.log("Stream user created/updated successfully");
+    } catch (error) {
+      console.log("Error in upsertStreamUser:", error);
+    }
+
+    res.status(200).json({ success: true, user: updatedUser });
+  } catch (error) {
+    console.log("Error in onboarding:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 const generateToken = (id) => {
   const token = jwt.sign({ userId: id }, process.env.JWT_SECRET_KEY, {
