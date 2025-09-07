@@ -34,12 +34,7 @@ export const register = async (req, res) => {
       middleName,
       password,
     });
-
-    const token = jwt.sign(
-      { userId: newUser._id },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: "7d" }
-    );
+    const token = generateToken(newUser._id);
 
     res.cookie("jwt", token, {
       maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -47,7 +42,6 @@ export const register = async (req, res) => {
       sameSite: "strict",
       secure: process.env.NODE_ENV === "production",
     });
-
     res.status(201).json({ success: true, user: newUser });
   } catch (error) {
     console.log("Error in signup ", error);
@@ -55,8 +49,43 @@ export const register = async (req, res) => {
   }
 };
 export const login = async (req, res) => {
-  res.send("login Route");
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Please provide email and password" });
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    const isPasswordCorrect = await user.matchPassword(password);
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    const token = generateToken(user._id);
+    res.cookie("jwt", token, {
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+    });
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    console.log("Error in login ", error);
+    res.status(500).json({ message: "Internal Server Error ", error });
+  }
 };
 export const logout = (req, res) => {
-  res.send("logout Route");
+  res.clearCookie("jwt");
+  res.status(200).json({ message: "Logged out successfully" });
+};
+
+const generateToken = (id) => {
+  const token = jwt.sign({ userId: id }, process.env.JWT_SECRET_KEY, {
+    expiresIn: "7d",
+  });
+
+  return token;
 };
