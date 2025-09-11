@@ -2,7 +2,9 @@ import express from "express";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import {
   acceptRejectFriendRequests,
+  getFriendRequests,
   getMyFriends,
+  getOutgoingFriendRequests,
   getRecommendedUsers,
   sendFriendRequests,
 } from "../controllers/user.controller.js";
