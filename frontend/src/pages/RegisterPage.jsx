@@ -173,6 +173,24 @@ const RegisterPage = () => {
             </form>
           </div>
         </div>
+        {/* {Signup form - Right side} */}
+        <div className="hidden lg:flex w-full lg:w-1/2 bg-primary/10 items-center justify-center">
+          <div className="max-w-md p-8">
+            <div className="relative aspect-square max-w-sm mx-auto">
+              <img
+                src="/vc_register.png"
+                alt="Video Call"
+                className="w-full h-full"
+              />
+            </div>
+            <div className="text-center space-y-3 mt-6">
+              <h2 className="text-xl font-semibold">Connect to the World</h2>
+              <p className="opacity-70">
+                Converse with anyone at any time, wherever you are!
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
