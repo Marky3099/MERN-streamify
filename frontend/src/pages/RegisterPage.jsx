@@ -1,6 +1,8 @@
 import { ShipWheelIcon } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { signup } from "../lib/api";
 
 const RegisterPage = () => {
   const [signupData, setSignupData] = useState({
@@ -10,8 +12,21 @@ const RegisterPage = () => {
     email: "",
     password: "",
   });
+
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: signupMutation,
+    isPending,
+    error,
+  } = useMutation({
+    mutationFn: signup,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["authUser"] }),
+  });
+
   const handleSignup = (e) => {
     e.preventDefault();
+    signupMutation(signupData);
   };
 
   return (
@@ -28,6 +43,12 @@ const RegisterPage = () => {
               Streamify
             </span>
           </div>
+          {/* Error Message */}
+          {error && (
+            <div className="alert alert-error mb-4 text-white">
+              <span>{error.response.data.message}</span>
+            </div>
+          )}
           <div className="w-full">
             <form onSubmit={handleSignup}>
               <div className="space-y-4">
@@ -159,7 +180,14 @@ const RegisterPage = () => {
                 </div>
 
                 <button className="btn btn-primary w-full" type="submit">
-                  Create Account
+                  {isPending ? (
+                    <>
+                      <span className="loading loading-spinner loading-xs"></span>
+                      Loading...
+                    </>
+                  ) : (
+                    "Create Account"
+                  )}
                 </button>
                 <div className="text-center mt-4">
                   <p className="text-sm">

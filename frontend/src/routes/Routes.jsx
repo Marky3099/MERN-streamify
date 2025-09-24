@@ -9,9 +9,15 @@ import OnboardingPage from "../pages/OnboardingPage.jsx";
 
 const AppRoutes = ({ auth }) => (
   <Routes>
-    <Route path="/" element={<HomePage />} />
-    <Route path="/register" element={<RegisterPage />} />
-    <Route path="/login" element={<LoginPage />} />
+    <Route path="/" element={auth ? <HomePage /> : <Navigate to="/login" />} />
+    <Route
+      path="/register"
+      element={!auth ? <RegisterPage /> : <Navigate to="/" />}
+    />
+    <Route
+      path="/login"
+      element={!auth ? <LoginPage /> : <Navigate to="/" />}
+    />
     <Route
       path="/notifications"
       element={auth ? <NotificationPage /> : <Navigate to="/login" />}
