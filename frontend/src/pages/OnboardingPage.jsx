@@ -1,7 +1,7 @@
 import React from "react";
 
 const OnboardingPage = () => {
-  return <div></div>;
+  return <div>OnBoarding</div>;
 };
 
 export default OnboardingPage;

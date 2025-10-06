@@ -7,9 +7,18 @@ import CallPage from "../pages/CallPage.jsx";
 import ChatPage from "../pages/ChatPage.jsx";
 import OnboardingPage from "../pages/OnboardingPage.jsx";
 
-const AppRoutes = ({ auth }) => (
+const AppRoutes = ({ auth, onBoard }) => (
   <Routes>
-    <Route path="/" element={auth ? <HomePage /> : <Navigate to="/login" />} />
+    <Route
+      path="/"
+      element={
+        auth && onBoard ? (
+          <HomePage />
+        ) : (
+          <Navigate to={!auth ? "/login" : "/onboarding"} />
+        )
+      }
+    />
     <Route
       path="/register"
       element={!auth ? <RegisterPage /> : <Navigate to="/" />}
